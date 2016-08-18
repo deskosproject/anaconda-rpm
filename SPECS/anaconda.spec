@@ -7,13 +7,16 @@ Release: 5%{?dist}.1
 License: GPLv2+ and MIT
 Group:   Applications/System
 URL:     http://fedoraproject.org/wiki/Anaconda
+Epoch:   1
 
 # To generate Source0 do:
 # git clone http://git.fedorahosted.org/git/anaconda.git
 # git checkout -b archive-branch anaconda-%%{version}-%%{release}
 # ./autogen.sh
 # make dist
-Source0: %{name}-%{version}.tar.bz2
+Source0: https://dl.deskosproject.org/sources/anaconda/%{name}-%{version}.tar.bz2
+Source1: install-button.png
+
 Patch1:	anaconda-centos-add-centos-install-class.patch
 Patch2:	anaconda-centos-set-right-eula-location.patch
 Patch4:	anaconda-centos-disable-mirrors.patch
@@ -86,15 +89,16 @@ BuildRequires: s390utils-devel
 %endif
 BuildRequires: libtimezonemap-devel >= %{libtimezonemapver}
 
-Requires: anaconda-core = %{version}-%{release}
-Requires: anaconda-gui = %{version}-%{release}
-Requires: anaconda-tui = %{version}-%{release}
+Requires: anaconda-core = 1:%{version}-%{release}
+Requires: anaconda-gui = 1:%{version}-%{release}
+Requires: anaconda-tui = 1:%{version}-%{release}
 
 %description
 The anaconda package is a metapackage for the Anaconda installer.
 
 %package core
 Summary: Core of the Anaconda installer
+Epoch: 1
 Requires: python-blivet >= 1:0.61.15.24
 Requires: python-meh >= %{mehver}
 Requires: libreport-anaconda >= 2.0.21-1
@@ -152,7 +156,7 @@ Requires: kexec-tools
 Requires: python-coverage
 
 # required because of the rescue mode and VNC question
-Requires: anaconda-tui = %{version}-%{release}
+Requires: anaconda-tui = 1:%{version}-%{release}
 
 Obsoletes: anaconda-images <= 10
 Provides: anaconda-images = %{version}-%{release}
@@ -166,8 +170,9 @@ system.
 
 %package gui
 Summary: Graphical user interface for the Anaconda installer
-Requires: anaconda-core = %{version}-%{release}
-Requires: anaconda-widgets = %{version}-%{release}
+Epoch: 1
+Requires: anaconda-core = 1:%{version}-%{release}
+Requires: anaconda-widgets = 1:%{version}-%{release}
 Requires: python-meh-gui >= %{mehver}
 Requires: adwaita-icon-theme
 Requires: system-logos
@@ -191,13 +196,15 @@ This package contains graphical user interface for the Anaconda installer.
 
 %package tui
 Summary: Textual user interface for the Anaconda installer
-Requires: anaconda-core = %{version}-%{release}
+Epoch: 1
+Requires: anaconda-core = 1:%{version}-%{release}
 
 %description tui
 This package contains textual user interface for the Anaconda installer.
 
 %package widgets
 Summary: A set of custom GTK+ widgets for use with anaconda
+Epoch: 1
 Group: System Environment/Libraries
 Requires: pygobject3
 Requires: python
@@ -207,6 +214,7 @@ This package contains a set of custom GTK+ widgets used by the anaconda installe
 
 %package widgets-devel
 Summary: Development files for anaconda-widgets
+Epoch: 1
 Group: Development/Libraries
 Requires: glade
 Requires: %{name}-widgets%{?_isa} = %{version}-%{release}
@@ -218,6 +226,7 @@ documentation for working with this library.
 
 %package dracut
 Summary: The anaconda dracut module
+Epoch: 1
 Requires: dracut >= %{dracutver}
 Requires: dracut-network
 Requires: xz
@@ -237,6 +246,19 @@ runtime on NFS/HTTP/FTP servers or local disks.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+
+# Convert CentOS to DeskOS
+find . -name *.po -print0 | xargs -0 sed -i 's/Fedora/DeskOS/g'
+sed -i 's|Fedora|DeskOS|g' data/liveinst/gnome/fedora-welcome
+sed -i 's|Fedora|DeskOS|g' data/liveinst/gnome/fedora-welcome.desktop*
+
+mv ./pyanaconda/installclasses/centos.py ./pyanaconda/installclasses/deskos.py
+sed -i s/centos/deskos/g ./pyanaconda/installclasses/deskos.py
+sed -i s/CentOS/DeskOS/g ./pyanaconda/installclasses/deskos.py
+sed -i 's/efi_dir = "deskos"/efi_dir = "centos"/g' ./pyanaconda/installclasses/deskos.py
+sed -i s/CentOS/DeskOS/g ./pyanaconda/bootloader.py
+
+cp -f %{SOURCE1} data/liveinst/gnome/
 
 %build
 %configure --disable-static \
@@ -328,6 +350,9 @@ update-desktop-database &> /dev/null || :
 %{_prefix}/libexec/anaconda/dd_*
 
 %changelog
+* Thu Aug 18 2016 Ricardo Arguello <rarguello@deskosproject.org> - 1:21.48.22.56-5.el7.deskos.1
+- Rebuilt for DeskOS
+
 * Thu Jan 14 2016 Karanbir Singh <kbsingh@centos.org> - 21.48.22.56-5.el7.centos.1
 - Handle CentOS infra specific atomic remotes
 
