@@ -3,7 +3,7 @@
 Summary: Graphical system installer
 Name:    anaconda
 Version: 21.48.22.56
-Release: 5%{?dist}.1
+Release: 5%{?dist}.2
 License: GPLv2+ and MIT
 Group:   Applications/System
 URL:     http://fedoraproject.org/wiki/Anaconda
@@ -24,6 +24,8 @@ Patch5:	anaconda-centos-bootfs-default-to-xfs.patch
 Patch6:	anaconda-centos-help-text.patch
 Patch7:	anaconda-centos-skip-retry-if-not-connected.patch
 Patch8: 9800-rpmostreepayload-Rework-remote-add-handling.patch
+Patch9: anaconda-deskos-remove-eula.patch
+Patch10: anaconda-deskos-translate-hack.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
@@ -246,16 +248,15 @@ runtime on NFS/HTTP/FTP servers or local disks.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
+%patch10 -p1
 
 # Convert CentOS to DeskOS
-find . -name *.po -print0 | xargs -0 sed -i 's/Fedora/DeskOS/g'
-sed -i 's|Fedora|DeskOS|g' data/liveinst/gnome/fedora-welcome
 sed -i 's|Fedora|DeskOS|g' data/liveinst/gnome/fedora-welcome.desktop*
 
 mv ./pyanaconda/installclasses/centos.py ./pyanaconda/installclasses/deskos.py
 sed -i s/centos/deskos/g ./pyanaconda/installclasses/deskos.py
 sed -i s/CentOS/DeskOS/g ./pyanaconda/installclasses/deskos.py
-sed -i 's/efi_dir = "deskos"/efi_dir = "centos"/g' ./pyanaconda/installclasses/deskos.py
 sed -i s/CentOS/DeskOS/g ./pyanaconda/bootloader.py
 
 cp -f %{SOURCE1} data/liveinst/gnome/
@@ -350,6 +351,9 @@ update-desktop-database &> /dev/null || :
 %{_prefix}/libexec/anaconda/dd_*
 
 %changelog
+* Wed Sep 21 2016 Ricardo Arguello <rarguello@deskosproject.org> - 1:21.48.22.56-5.el7.deskos.2
+- Removed the eula and patched fedora-welcome
+
 * Thu Aug 18 2016 Ricardo Arguello <rarguello@deskosproject.org> - 1:21.48.22.56-5.el7.deskos.1
 - Rebuilt for DeskOS
 
