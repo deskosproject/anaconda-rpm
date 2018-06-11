@@ -1,0 +1,22 @@
+image: centos:7
+
+stages:
+  - build
+
+build:
+  stage: build
+  script:
+    - yum -y install which
+    - yum -y install https://dl.deskosproject.org/pub/deskos/releases/7/x86_64/deskos-packager-0.2.0-1.el7.deskos.noarch.rpm
+    - curl https://raw.githubusercontent.com/deskosproject/deskos-git-common/master/into_srpm.sh > /usr/local/bin/into_srpm.sh
+    - curl https://raw.githubusercontent.com/deskosproject/deskos-git-common/master/get_sources.sh > /usr/local/bin/get_sources.sh
+    - chmod +x /usr/local/bin/*.sh
+    - into_srpm.sh
+    - cp -p SRPMS/*.rpm /var/tmp/
+    - useradd mockuser && usermod -a -G mock mockuser
+    - su - mockuser -c "mock -r deskos-7-x86_64 /var/tmp/*.rpm"
+    - cp -p /var/lib/mock/deskos-7-x86_64/result/*.rpm RPMS/
+  artifacts:
+    paths:
+    - RPMS
+    - SRPMS
