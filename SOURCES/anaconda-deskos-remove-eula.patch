@@ -1,7 +1,7 @@
-diff -Naur anaconda-21.48.22.93.orig/pyanaconda/ui/gui/hubs/progress.py anaconda-21.48.22.93/pyanaconda/ui/gui/hubs/progress.py
---- anaconda-21.48.22.93.orig/pyanaconda/ui/gui/hubs/progress.py	2016-09-05 07:10:25.000000000 -0500
-+++ anaconda-21.48.22.93/pyanaconda/ui/gui/hubs/progress.py	2016-12-14 23:38:04.211360089 -0500
-@@ -34,7 +34,7 @@
+diff -Naur anaconda-21.48.22.134.orig/pyanaconda/ui/gui/hubs/progress.py anaconda-21.48.22.134/pyanaconda/ui/gui/hubs/progress.py
+--- anaconda-21.48.22.134.orig/pyanaconda/ui/gui/hubs/progress.py	2017-04-04 08:21:10.000000000 -0500
++++ anaconda-21.48.22.134/pyanaconda/ui/gui/hubs/progress.py	2018-06-10 22:35:30.112838569 -0500
+@@ -38,7 +38,7 @@
  from pyanaconda.flags import flags
  from pyanaconda import iutil
  from pyanaconda.constants import THREAD_INSTALL, THREAD_CONFIGURATION, DEFAULT_LANG, IPMI_FINISHED
@@ -10,7 +10,7 @@ diff -Naur anaconda-21.48.22.93.orig/pyanaconda/ui/gui/hubs/progress.py anaconda
  from pykickstart.constants import KS_SHUTDOWN, KS_REBOOT
  
  from pyanaconda.ui.gui.hubs import Hub
-@@ -137,7 +137,7 @@
+@@ -141,7 +141,7 @@
  
          iutil.ipmi_report(IPMI_FINISHED)
  

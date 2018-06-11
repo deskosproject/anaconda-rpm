@@ -2,8 +2,8 @@
 
 Summary: Graphical system installer
 Name:    anaconda
-Version: 21.48.22.93
-Release: 1%{?dist}.0.1
+Version: 21.48.22.134
+Release: 1%{?dist}
 License: GPLv2+ and MIT
 Group:   Applications/System
 URL:     http://fedoraproject.org/wiki/Anaconda
@@ -24,42 +24,45 @@ Patch5:	anaconda-centos-bootfs-default-to-xfs.patch
 Patch6:	anaconda-centos-help-text.patch
 Patch7:	anaconda-centos-skip-retry-if-not-connected.patch
 Patch8: 9800-rpmostreepayload-Rework-remote-add-handling.patch
-Patch9: anaconda-deskos-remove-eula.patch
-Patch10: anaconda-deskos-translate-hack.patch
+Patch9: yumpayload-dont-verify-disabled-repos.patch
+
+Patch40: anaconda-deskos-remove-eula.patch
+Patch41: anaconda-deskos-translate-hack.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
+%define dbusver 1.2.3
+%define dracutver 033-240
+%define fcoeutilsver 1.0.12-3.20100323git
+%define firewalldver 0.3.5-1
 %define gettextver 0.18.1
+%define gtk3ver 3.22.10
+%define helpver 1:7.5.3-1
 %define intltoolver 0.31.2-3
-%define pykickstartver 1.99.66.9
-%define yumver 3.4.3-91
+%define iscsiver 6.2.0.870-3
+%define isomd5sum 1.0.10
+%define langtablever 0.0.31-3
+%define libarchivever 3.0.4
+%define libtimezonemapver 0.4.1-2
+%define libxklavierver 5.4
+%define mehver 0.23-1
+%define nmver 1.0.0-6.git20150107
 %define partedver 1.8.1
+%define pykickstartver 1.99.66.18
 %define pypartedver 2.5-2
 %define pythonpyblockver 0.45
-%define nmver 1.0.0-6.git20150107
-%define dbusver 1.2.3
-%define yumutilsver 1.1.11-3
-%define mehver 0.23-1
-%define sckeyboardver 1.3.1
-%define firewalldver 0.3.5-1
 %define pythonurlgrabberver 3.9.1-5
-%define utillinuxver 2.15.1
-%define dracutver 033-240
-%define isomd5sum 1.0.10
-%define fcoeutilsver 1.0.12-3.20100323git
-%define iscsiver 6.2.0.870-3
 %define rpmver 4.10.0
-%define libarchivever 3.0.4
-%define langtablever 0.0.31-3
-%define libxklavierver 5.4
-%define libtimezonemapver 0.4.1-2
-%define helpver 1:7.3.1-1
+%define sckeyboardver 1.3.1
+%define utillinuxver 2.15.1
+%define yumutilsver 1.1.11-3
+%define yumver 3.4.3-91
 
 BuildRequires: audit-libs-devel
 BuildRequires: gettext >= %{gettextver}
-BuildRequires: gtk3-devel
+BuildRequires: gtk3-devel >= %{gtk3ver}
 BuildRequires: gtk-doc
-BuildRequires: gtk3-devel-docs
+BuildRequires: gtk3-devel-docs >= %{gtk3ver}
 BuildRequires: glib2-doc
 BuildRequires: gobject-introspection-devel
 BuildRequires: glade-devel
@@ -101,7 +104,7 @@ The anaconda package is a metapackage for the Anaconda installer.
 %package core
 Summary: Core of the Anaconda installer
 Epoch: 1
-Requires: python-blivet >= 1:0.61.15.52
+Requires: python-blivet >= 1:0.61.15.60
 Requires: python-meh >= %{mehver}
 Requires: libreport-anaconda >= 2.0.21-1
 Requires: libreport-rhel-anaconda-bugzilla >= 2.1.11-1
@@ -252,7 +255,8 @@ runtime on NFS/HTTP/FTP servers or local disks.
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
-%patch10 -p1
+%patch40 -p1
+%patch41 -p1
 
 # Convert CentOS to DeskOS
 sed -i 's|Fedora|DeskOS|g' data/liveinst/gnome/fedora-welcome.desktop*
@@ -355,19 +359,414 @@ update-desktop-database &> /dev/null || :
 %{_prefix}/libexec/anaconda/dd_*
 
 %changelog
-* Wed Dec 14 2016 Ricardo Arguello <rarguello@deskosproject.org> - 1:21.48.22.93-1.el7.deskos.0.1
+* Sun Jun 10 2018 Ricardo Arguello <rarguello@deskosproject.org> - 1:21.48.22.134-1.el7.deskos
 - Rebuilt for DeskOS
-- Removed the eula and patched fedora-welcome
 
-* Thu Nov 30 2016 Johnny Hughes <johnny@centos.org> - 21.48.22.93-1.el7.centos.0.1
-- Refactor anaconda-centos-add-centos-install-class.patch for NM Autoconnect issue
-
-* Thu Nov 03 2016 CentOS Sources <bugs@centos.org> - 21.48.22.93-1.el7.centos
+* Tue Apr 10 2018 CentOS Sources <bugs@centos.org> - 21.48.22.134-1.el7.centos
 - Add CentOS install class as default
 - use the right path for the EULA string (issue 7165,  bstinson)
 - use efi_dir = centos
 - disable the mirrorlist options
 - make boot part fs default to xfs
+
+* Mon Feb 19 2018 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.134-1
+- Revert "UI support for configuring certain mitigations (mkolman)"
+  Resolves: rhbz#1546267
+- Revert "Performance spoke related CI fixes" (mkolman)
+  Related: rhbz#1546267
+- Revert "Fix mitigation toggling with kickstart" (mkolman)
+  Related: rhbz#1546267
+
+* Wed Feb 14 2018 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.133-1
+- Fix mitigation toggling with kickstart (mkolman)
+  Related: rhbz#1534833
+
+* Mon Feb 12 2018 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.132-1
+- Performance spoke related CI fixes (mkolman)
+  Related: rhbz#1534833
+
+* Wed Feb 07 2018 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.131-1
+- UI support for configuring certain mitigations (mkolman)
+  Resolves: rhbz#1534833
+
+* Mon Jan 08 2018 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.130-1
+- kickstart: use RHEL7_Firewall instead of F28_Firewall (dusty)
+  Related: rhbz#1526450
+- kickstart: support firewall --use-system-defaults (dusty)
+  Resolves: rhbz#1526450
+- Check payload is set before accessing its data (mkolman)
+  Resolves: rhbz#1524785
+- Fix bad bash '*' expansion when loading kernel modules (jkonecny)
+  Resolves: rhbz#1519220
+
+* Fri Dec 08 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.129-1
+- Update translations (ljanda)
+  Resolves: rhbz#1480523
+
+* Wed Nov 15 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.128-1
+- Add support for the new 'mount' kickstart command (vpodzime)
+  Resolves: rhbz#1450922
+
+* Tue Nov 07 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.127-1
+- Enable SE/HMC file access to repo (vponcova)
+  Resolves: rhbz#1289918
+- Support timeout and retries options in %%packages section (vponcova)
+  Resolves: rhbz#1448459
+
+* Thu Oct 12 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.126-1
+- Add support for the RHV branded help content variant (mkolman)
+  Resolves: rhbz#1378010
+
+* Thu Oct 05 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.125-1
+- Fix storage spoke completeness checking (rvykydal)
+  Resolves: rhbz#1496416
+- Missing dot in testing availability message (jkonecny)
+  Related: rhbz#1478970
+
+* Thu Sep 07 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.124-1
+- network: add support for kickstart --bindto=mac for virtual devices
+  (rvykydal)
+  Resolves: rhbz#1328576
+- network: support mac bound network settings as first class (rvykydal)
+  Related: rhbz#1328576
+- network: add support for kickstart --bindto=mac for wired devices (rvykydal)
+  Resolves: rhbz#1328576
+
+* Mon Sep 04 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.123-1
+- Skip temporarily unavailable checks in the source spoke (mkolman)
+  Resolves: rhbz#1365416
+- Fix restart payload thread in Network spoke GUI (jkonecny)
+  Related: rhbz#1478970
+- Add the boot option inst.xtimeout (vponcova)
+  Resolves: rhbz#1462035
+- Add missing gtk3 required version to spec file (jkonecny)
+  Resolves: rhbz#1445648
+- Sort spec required versions alphabetically (jkonecny)
+  Related: rhbz#1445648
+- Fix testing of the kickstart version (vponcova)
+  Related: rhbz#1412159
+- Add tests for the install class factory and the installclass command
+  (vponcova)
+  Related: rhbz#1412159
+- Support for the installclass kickstart command (vponcova)
+  Resolves: rhbz#1412159
+- Modules with install classes should define __all__ (vponcova)
+  Related: rhbz#1412159
+- Refactorization of the installclass.py (vponcova)
+  Related: rhbz#1412159
+- timezone: for kickstart allow also timezones not offered by GUI (rvykydal)
+  Resolves: rhbz#1452873
+
+* Tue Aug 22 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.122-1
+- Network spoke freeze when testing availability (jkonecny)
+  Related: rhbz#1478970
+- Fix proxy settings badly used when testing repos (jkonecny)
+  Resolves: rhbz#1478970
+- installclasses/rhelah: Bump default / to 15GB max (walters)
+  Resolves: rhbz#1481768
+- Prevent crash in GUI with incomplete IMSM array (mkolman)
+  Resolves: rhbz#1465944
+- Show IDs of DASDs to be formatted in TUI (vponcova)
+  Resolves: rhbz#1269174
+- rpmostreepayload: Rollup backport of Fedora patches (walters)
+  Resolves: rhbz#1459623
+- Use SHA256 instead of MD5 for repoMDHash (bcl)
+  Related: rhbz#1341280
+- Refactor imports in kickstart.py (jkonecny)
+  Related: rhbz#1463118
+- Use context manager to check KickstartError (jkonecny)
+  Resolves: rhbz#1463118
+- Use KickstartError instead of KickstartParseError (jkonecny)
+  Related: rhbz#1463118
+
+* Wed Jun 21 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.121-1
+- rpmostreepayload: Stub out payload methods which use `import rpm` (walters)
+  Related: rhbz#1462979
+
+* Tue Jun 13 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.120-1
+- Update translations (ljanda)
+  Related: rhbz#1383911
+
+* Mon Jun 12 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.119-1
+- Delete file systems used only by a given installation (vponcova)
+  Resolves: rhbz#1453097
+
+* Thu Jun 08 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.118-1
+- rpmostreepayload: [rhel7only] Move tmpfiles to after mount setup (walters)
+  Resolves: rhbz#1459623
+- rpmostreepayload: Handle /var as a user-specified mountpoint (walters)
+  Resolves: rhbz#1459623
+
+* Tue May 30 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.117-1
+- Root checking fixes password for password from kickstart (mkolman)
+  Related: rhbz#1356966
+- Improve the GUI password checker (mkolman)
+  Related: rhbz#1356966
+- Respect changesok policy on root password spoke (mkolman)
+  Resolves: rhbz#1356966
+- Update translations of password checking strings (rvykydal)
+  Resolves: rhbz#1383911
+
+* Mon May 29 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.116-1
+- Allow nonstrict behaviour for all passwords in tui (vponcova)
+  Resolves: rhbz#1450326
+- Fix setting errors and warnings in the StorageCheckHandler (vponcova)
+  Resolves: rhbz#1453130
+- Mark post inst tools as disabled only if firstboot --disable is used
+  (mkolman)
+  Resolves: rhbz#1448940
+- Set the default filesystem type from a kickstart file (vponcova)
+  Resolves: rhbz#1449099
+
+* Wed May 24 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.115-1
+- Show a no network warning for network installation source. (vponcova)
+  Related: rhbz#1418604
+- Show warnings about enabling the network time (vponcova)
+  Resolves: rhbz#1418604
+- Fix generating UUID even for pre snapshots (jkonecny)
+  Related: rhbz#1113207
+
+* Mon May 15 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.114-1
+- Show the text of completions in the datetime spoke. (vponcova)
+  Related: rhbz#1447984
+- Look higher for the combobox associated with an entry (dshea)
+  Resolves: rhbz#1447984
+- Fix the addon handlers for the checkbox (vponcova)
+  Resolves: rhbz#1448187
+
+* Thu May 11 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.113-1
+- network: handle multiple connections for one device better (rvykydal)
+  Resolves: rhbz#1444887
+- network: catch exception when reading in-memory connection being removed
+  (rvykydal)
+  Related: rhbz#1444887
+- Compare empty confirmation field against input (mkolman)
+  Resolves: rhbz#1438832
+
+* Tue May 09 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.112-1
+- Properly iterate over kickstart locations in a job (vponcova)
+  Resolves: rhbz#1443485
+- Onlyuse devices of the ignoredisk command should be only disks (vponcova)
+  Related: rhbz#1327439
+- Fix device_name_is_disk to fully support raid devices (vponcova)
+  Resolves: rhbz#1327439
+
+* Thu Apr 27 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.111-1
+- Adapt to treeinfo addon section format change (rvykydal)
+  Related: rhbz#1437510
+- Make geolocation with kickstart possible (mkolman)
+  Resolves: rhbz#1358331
+- Show or hide the content of the expander (vponcova)
+  Resolves: rhbz#1441733
+- Fix a typo in anaconda-pre.service (mkolman)
+  Resolves: rhbz#1421246
+
+* Thu Apr 20 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.110-1
+- Adapt to treeinfo format change (variants -> addons) (rvykydal)
+  Resolves: rhbz#1437510
+- network: fix setting hostname via boot options (rvykydal)
+  Resolves: rhbz#1441337
+- Bump version of Pykickstart and Blivet (jkonecny)
+  Related: rhbz#1113207
+- Add XFS uuid changer (jkonecny)
+  Related: rhbz#1113207
+- Support --when parameter in snapshot (jkonecny)
+  Related: rhbz#1113207
+- Add snapshot support (jkonecny)
+  Resolves: rhbz#1113207
+
+* Wed Apr 12 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.109-1
+- Update 64bit grub2 support to reflect packages as they actually landed
+  (pjones)
+  Related: rhbz#1310779
+- Fix potential bugs reported by Pylint 1.6 (mkolman)
+  Related: rhbz#1440190
+- Fix unused variables and imports (mkolman)
+  Related: rhbz#1440190
+- Disable Pylint false positives (mkolman)
+  Related: rhbz#1440190
+- Fix Pylint LoggingChecker usage (mkolman)
+  Resolves: rhbz#1440190
+- Call subprocess.Popen with absolute path to a binary (rvykydal)
+  Resolves: rhbz#1411407
+
+* Mon Apr 10 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.108-1
+- Gtk: Fix css selectors. (vponcova)
+  Resolves: rhbz#1439766
+- Gtk: Set CSS names on all of the anaconda classes. (dshea)
+  Resolves: rhbz#1439766
+- Gtk: Fix deprecated pseudo-classes. (vponcova)
+  Resolves: rhbz#1433943
+- Gtk: Fix warnings in anaconda widgets. (dshea)
+  Resolves: rhbz#1433943
+- Gtk: Calculate the preferred size of the image. (vponcova)
+  Resolves: rhbz#1433943
+
+* Tue Apr 04 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.107-1
+- Gtk: Add gi.require_version to specify versions. (vponcova)
+  Resolves: rhbz#1433943
+- Use the function we already have for applying disk selection (rvykydal)
+  Related: rhbz#1412022
+- Ignore disks labeled OEMDRV (rvykydal)
+  Resolves: rhbz#1412022
+
+* Mon Apr 03 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.106-1
+- Pylint fixes (rvykydal)
+  Related: rhbz#1429576
+- Make 64-bit kernel on 32-bit firmware work for x86 efi machines (pjones)
+  Resolves: rhbz#1310779
+
+* Wed Mar 29 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.105-1
+- gui: show supported locales on Atomic Host installs (jlebon)
+  Resolves: rhbz#1429576
+- Specify unit for reserved space in VG (vpodzime)
+  Resolves: rhbz#1260887
+- Add support for --chunksize raid kickstart option (vtrefny)
+  Resolves: rhbz#1332316
+
+* Thu Mar 23 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.104-1
+- util: Add script to capture logs (riehecky)
+  Resolves: rhbz#1431313
+
+* Mon Mar 20 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.103-1
+- network tui: fix changing ipv4 config from static to dhcp (rvykydal)
+  Resolves: rhbz#1432886
+
+* Thu Mar 16 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.102-1
+- Add support for kickstart %%onerror scripts (clumens)
+  Resolves: rhbz#1412538
+- Fix partial kickstart software selection in GUI (jkonecny)
+  Related: rhbz#1404158
+- Show the network spoke in Initial Setup TUI (mkolman)
+  Resolves: rhbz#1302165
+- yum: Always release payload and catch raised exceptions. (vponcova)
+  Related: rhbz#979307
+- tui: Treat dependency errors as errors in the software spoke (vponcova)
+  Resolves: rhbz#979307
+- tui: Properly initialize the software spoke. (vponcova)
+  Related: rhbz#1371229
+- Propagate firstboot --disable to Screen Access Manager (mkolman)
+  Related: rhbz#1422867
+- Use Screen Access Manager (mkolman)
+  Related: rhbz#1422867
+- Add screen entry/exit callbacks (mkolman)
+  Related: rhbz#1422867
+- Add screen access manager (mkolman)
+  Resolves: rhbz#1422867
+- Removed unused code in the Software spoke (jkonecny)
+  Related: rhbz#1404158
+- Fix selection logic in Software spoke (jkonecny)
+  Resolves: rhbz#1404158
+- Support --nohome option in the autopartitioning (vponcova)
+  Resolves: rhbz#663099
+- tui: Remember the custom software selection (vponcova)
+  Resolves: rhbz#1371229
+
+* Mon Mar 13 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.101-1
+- Mock can now be set more easily by CI (jkonecny)
+  Resolves: rhbz#1430728
+
+* Mon Mar 06 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.100-1
+- Fix Driver Disc documentation (jkonecny)
+  Related: rhbz#1377233
+- Support DD rpm loading from local disk device (jkonecny)
+  Resolves: rhbz#1377233
+- Fix a Pylint warning (mkolman)
+  Related: rhbz#1425760
+- Remove redundant help content generation code (mkolman)
+  Resolves: rhbz#1428787
+- network: create dracut arguments for iSCSI root accessed via vlan (rvykydal)
+  Resolves: rhbz#1374003
+- Add support for RHVH custom storage checking (vponcova)
+  Related: rhbz#1412151
+- Enable the install class to customize the storage checking (vponcova)
+  Resolves: rhbz#1412151
+- Replace sanity check with more advanced storage checker (vponcova)
+  Related: rhbz#1412151
+- Rename StorageChecker to StorageCheckHandler (vponcova)
+  Related: rhbz#1412151
+- Perform recursive copying of driver disk RPM repo contents (esyr)
+  Resolves: rhbz#1425760
+- Fix a typo in an error message (esyr)
+  Related: rhbz#1425760
+- Don't block gui during dasd formating (vponcova)
+  Resolves: rhbz#1335465
+- rhev: add /home /tmp /var/log /var/log/audit (dougsland)
+  Resolves: rhbz#1422952
+- Increase verbosity of lvmdump in pre logging script (jkonecny)
+  Related: rhbz#1255659
+
+* Mon Feb 27 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.99-1
+- Improved password quality checking (mkolman)
+  Resolves: rhbz#1380277
+  Resolves: rhbz#1383718
+  Resolves: rhbz#1356975
+- Use correct default password quality value (mkolman)
+  Related: rhbz#1380277
+  Related: rhbz#1383718
+- Use initialization controller for spoke initialization (mkolman)
+  Related: rhbz#1380224
+- Add module initialization controller (mkolman)
+  Resolves: rhbz#1380224
+- Add the synchronized decorator (mkolman)
+  Related: rhbz#1380224
+- Add a signal/slot implementation (mkolman)
+  Related: rhbz#1380224
+
+* Mon Feb 20 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.98-1
+- Lock empty root password during kickstart installation (mkolman)
+  Resolves: rhbz#1383656
+- Enable multiple inst.stage2 urls (vponcova)
+  Resolves: rhbz#1391724
+- Enable multiple inst.ks urls (vponcova)
+  Resolves: rhbz#1391724
+- tui: AutoPartSpoke should not be discovered by a hub (vponcova)
+  Related: rhbz#1380767
+- Enable to define the autopart type in an install class (vponcova)
+  Resolves: rhbz#1380767
+- Always set the default partitioning (vponcova)
+  Resolves: rhbz#1380767
+
+* Mon Feb 13 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.97-1
+- Add inst.waitfornet option (rvykydal)
+  Resolves: rhbz#1315160
+- Add support for IPoIB in tui (rvykydal)
+  Resolves: rhbz#1366935
+
+* Tue Feb 07 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.96-1
+- Add unit test for RepoMDMetaHash object (jkonecny)
+  Related: rhbz#1373449
+- Make the comments in payload and yumpayload consistent (jkonecny)
+  Related: rhbz#1373449
+- Fix Anaconda forces payload restart when network (not)change (jkonecny)
+  Resolves: rhbz#1358778
+  Resolves: rhbz#1373449
+- network: index team slave connection names starting with 1 (rvykydal)
+  Resolves: rhbz#1401403
+- network: fix --noipv4 via %%pre (rvykydal)
+  Resolves: rhbz#1418289
+
+* Thu Feb 02 2017 Radek Vykydal <rvykydal@redhat.com> - 21.48.22.95-1
+- Close connections to the yum database (vponcova)
+  Resolves: rhbz#1362427
+- network: fix --activate for bridge slaves configured via %%pre ks (rvykydal)
+  Resolves: rhbz#1416655
+- network: activate bridge for first network command in ks via %%pre (rvykydal)
+  Resolves: rhbz#1416655
+- network: unify slave connection names for ks %%pre with ks and gui (rvykydal)
+  Resolves: rhbz#1416655
+- network: respect --activate value for bridge from kickstart (rvykydal)
+  Resolves: rhbz#1416687
+
+* Mon Jan 30 2017  Radek Vykydal <rvykydal@redhat.com> - 21.48.22.94-1
+- network: bind slave connections to DEVICE, not HWADDR (rvykydal)
+  Related: rhbz#1373360
+- Catch race-condition error reading from in-memory connection being removed
+  (rvykydal)
+  Related: rhbz#1373360
+- Allow setting up bridge for fetching isntaller image from kickstart
+  (rvykydal)
+  Resolves: rhbz#1373360
 
 * Mon Sep 26 2016 Samantha N. Bueno <sbueno+anaconda@redhat.com> - 21.48.22.93-1
 - Accept any non-empty password in non-strict mode (mkolman)

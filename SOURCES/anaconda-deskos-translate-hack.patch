@@ -1,6 +1,6 @@
-diff -Naur anaconda-21.48.22.56.orig/data/liveinst/gnome/fedora-welcome anaconda-21.48.22.56/data/liveinst/gnome/fedora-welcome
---- anaconda-21.48.22.56.orig/data/liveinst/gnome/fedora-welcome	2015-10-22 11:34:02.000000000 -0500
-+++ anaconda-21.48.22.56/data/liveinst/gnome/fedora-welcome	2016-09-21 09:29:53.303683179 -0500
+diff -Naur anaconda-21.48.22.134.orig/data/liveinst/gnome/fedora-welcome anaconda-21.48.22.134/data/liveinst/gnome/fedora-welcome
+--- anaconda-21.48.22.134.orig/data/liveinst/gnome/fedora-welcome	2017-01-30 05:03:51.000000000 -0500
++++ anaconda-21.48.22.134/data/liveinst/gnome/fedora-welcome	2018-06-10 22:45:52.878406135 -0500
 @@ -62,7 +62,7 @@
                                                  default_width: 600,
                                                  default_height: 550,
@@ -19,12 +19,11 @@ diff -Naur anaconda-21.48.22.56.orig/data/liveinst/gnome/fedora-welcome anaconda
  
        let tryButton = new Gtk.Button({ child: tryContent });
        buttonBox.add(tryButton);
-@@ -107,7 +107,7 @@
-       let installButton = new Gtk.Button({ child: installContent });
+@@ -108,6 +108,7 @@
        buttonBox.add(installButton);
  
--      this._label = makeLabel(_("You are currently running Fedora from live media.\nYou can install Fedora now, or choose \"Install to Hard Drive\" in the Activities Overview at any later time."), false);
-+      this._label = makeLabel(_("Actualmente está ejecutando DeskOS desde un medio vivo.\nPuede instalar DeskOS ahora, o elegir «Instalar en el disco duro» en el resumen de actividades en cualquier momento."), false);
+       this._label = makeLabel(_("You are currently running Fedora from live media.\nYou can install Fedora now, or choose \"Install to Hard Drive\" in the Activities Overview at any later time."), false);
++      this._label = makeLabel(_("Actualmente está ejecutando DeskOS desde un medio vivo.\nPuede instalar DeskOS ahora, o elegir \"Instalar en el disco duro\" posteriormente."), false);
        mainGrid.add(this._label);
  
        installButton.connect('clicked', Lang.bind(this,
